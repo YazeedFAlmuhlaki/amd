@@ -48,14 +48,6 @@ WadhahApp/
 └── Assets.xcassets            # banklogo, Wad, car & airalo banners
 ```
 
-## Getting Started
-
-1. Clone the repository.
-2. Open `WadhahApp.xcodeproj` in Xcode 16 or later.
-3. Select an iOS 17+ simulator (e.g. iPhone 17 Pro) and run.
-
-> The current build is a visual prototype: chat scenarios are scripted and data is provided by `DummyData`. The KMP shared module will replace the dummy layer with live services.
-
 ## Roadmap
 
 - Wire the chat to a live generative AI backend through the KMP shared module.
