@@ -49,7 +49,7 @@ object MockBankRepository {
             merchantDescriptor = "NAFT SERVICES CO",
             merchantDisplayName = "نفط",
             categoryLabel = "محطة وقود",
-            timestampLabel = "قبل ٣ أيام",
+            timestampLabel = "قبل 3 أيام",
             amountSAR = -120.00,
         ),
         BankTransaction(
@@ -57,7 +57,7 @@ object MockBankRepository {
             merchantDescriptor = "ELIXIR BUN CO",
             merchantDisplayName = "إلكسير بن",
             categoryLabel = "قهوة مختصة",
-            timestampLabel = "قبل ٤ أيام",
+            timestampLabel = "قبل 4 أيام",
             amountSAR = -26.00,
         ),
     )

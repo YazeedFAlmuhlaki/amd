@@ -3,8 +3,10 @@ import SwiftUI
 
 // MARK: - Swift mirror of the KMP shared module
 // BankStore mirrors `com.wadhah.shared.data.MockBankRepository` and WadhahChatEngine
-// mirrors `com.wadhah.shared.chat.WadhahAssistant` 1:1, so the views bind to these today
-// and swap to the compiled WadhahShared.xcframework with an import change on a Mac.
+// mirrors `com.wadhah.shared.chat.WadhahAssistant`. The shared data is identical; the
+// shapes differ slightly (the KMP side has no systemIcon and uses scenarioId strings),
+// so wiring in WadhahShared.xcframework needs a thin adapter mapping its types onto
+// Transaction/ChatScenario — see the README's "Building the KMP framework" section.
 
 struct Account {
     let holderFirstName: String

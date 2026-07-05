@@ -45,6 +45,7 @@ WadhahApp/
 ├── BankStore.swift            # Swift mirror of the KMP repository/assistant
 ├── Components.swift           # TransactionRow, WadhahPill, WadhahTabBar
 ├── DashboardView.swift        # Screen 1: Home dashboard (BankStore-driven)
+├── HomeView.swift             # Deprecated alias (typealias HomeView = DashboardView)
 ├── TransactionHistoryView.swift # Screen 2: Transaction history
 ├── WadhahChatView.swift       # Screens 3 & 4: Wadhah chat (push or bottom sheet)
 └── Assets.xcassets            # banklogo, Wad, car & airalo banners
@@ -64,9 +65,11 @@ gradle wrapper                                        # once, to generate ./grad
 ```
 
 Then link `shared/build/XCFrameworks/release/WadhahShared.xcframework` into the
-Xcode project and replace the mirrors in `BankStore.swift` with the shared APIs
-(`MockBankRepository`, `WadhahAssistant`). The `:shared` module also has a `jvm()`
-target so the Kotlin code builds and tests on any machine.
+Xcode project and back `BankStore.swift` with the shared APIs (`MockBankRepository`,
+`WadhahAssistant`) via a thin adapter — the KMP types carry the same data but not
+identical shapes (e.g. `scenarioId: String?` maps to `ChatScenario`, and `systemIcon`
+stays a Swift-side concern). The `:shared` module also has a `jvm()` target so the
+Kotlin code builds and tests on any machine.
 
 ## Roadmap
 
