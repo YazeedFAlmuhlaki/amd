@@ -5,7 +5,7 @@ import SwiftUI
 
 enum Route: Hashable {
     case history
-    case chat(ChatScenario)
+    case chat(ChatScenario?)
 }
 
 @main
@@ -21,9 +21,11 @@ struct WadhahApp: App {
 }
 
 struct RootView: View {
+    @StateObject private var store = BankStore()
+
     var body: some View {
         NavigationStack {
-            HomeView()
+            DashboardView()
                 .navigationDestination(for: Route.self) { route in
                     switch route {
                     case .history:
@@ -33,11 +35,12 @@ struct RootView: View {
                     }
                 }
         }
+        .environmentObject(store)
         .tint(WadhahTheme.accent)
     }
 }
 
-#Preview("Home") {
+#Preview("Dashboard") {
     RootView()
         .environment(\.layoutDirection, .rightToLeft)
 }

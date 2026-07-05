@@ -1,24 +1,43 @@
 import SwiftUI
 
 // MARK: - Screens 3 & 4: Wadhah Chat (وضح - مساعدك البنكي)
-// One view drives both scripted scenarios (Apple subscription / ambiguous merchant).
+// Driven by WadhahChatEngine (the Swift mirror of the KMP WadhahAssistant).
+// Presentable both pushed (from history) and as a bottom sheet (from the dashboard).
 
 struct WadhahChatView: View {
-    let scenario: ChatScenario
+    var asSheet = false
+    @Environment(\.dismiss) private var dismiss
+    @StateObject private var engine: WadhahChatEngine
     @State private var draft = ""
+
+    init(scenario: ChatScenario?, asSheet: Bool = false) {
+        self.asSheet = asSheet
+        _engine = StateObject(wrappedValue: WadhahChatEngine(scenario: scenario))
+    }
 
     var body: some View {
         VStack(spacing: 0) {
-            ScrollView {
-                VStack(spacing: 16) {
-                    userBubble
-                    assistantBubble
-                    Text("وضح · الآن")
-                        .font(.system(size: 10))
-                        .foregroundStyle(WadhahTheme.textSecondary)
-                        .frame(maxWidth: .infinity, alignment: .leading)
+            ScrollViewReader { proxy in
+                ScrollView {
+                    VStack(spacing: 16) {
+                        ForEach(engine.messages) { message in
+                            bubble(for: message)
+                                .id(message.id)
+                        }
+
+                        Text("وضح · الآن")
+                            .font(.system(size: 10))
+                            .foregroundStyle(WadhahTheme.textSecondary)
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                    }
+                    .padding(16)
                 }
-                .padding(16)
+                .onChange(of: engine.messages) { _, messages in
+                    guard let last = messages.last else { return }
+                    withAnimation(.easeOut(duration: 0.25)) {
+                        proxy.scrollTo(last.id, anchor: .bottom)
+                    }
+                }
             }
             inputBar
         }
@@ -43,13 +62,37 @@ struct WadhahChatView: View {
                         .background(WadhahTheme.accent, in: Circle())
                 }
             }
+
+            if asSheet {
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button {
+                        dismiss()
+                    } label: {
+                        Image(systemName: "xmark")
+                            .font(.system(size: 13, weight: .semibold))
+                            .foregroundStyle(WadhahTheme.textPrimary)
+                            .frame(width: 32, height: 32)
+                            .background(WadhahTheme.card, in: Circle())
+                    }
+                }
+            }
         }
     }
 
     // MARK: Bubbles
 
-    private var userBubble: some View {
-        Text(scenario.userMessage)
+    @ViewBuilder
+    private func bubble(for message: WadhahChatMessage) -> some View {
+        switch message.role {
+        case .user:
+            userBubble(message)
+        case .assistant:
+            assistantBubble(message)
+        }
+    }
+
+    private func userBubble(_ message: WadhahChatMessage) -> some View {
+        Text(message.text)
             .font(.system(size: 14, weight: .medium))
             .foregroundStyle(.white)
             .padding(14)
@@ -58,22 +101,42 @@ struct WadhahChatView: View {
             .padding(.leading, 40)
     }
 
-    private var assistantBubble: some View {
-        VStack(alignment: .leading, spacing: 14) {
-            Text(scenario.assistantMessage)
-                .font(.system(size: 14))
-                .foregroundStyle(Color(hex: 0x2A2A2A))
-                .lineSpacing(3)
+    private func assistantBubble(_ message: WadhahChatMessage) -> some View {
+        HStack(alignment: .bottom, spacing: 8) {
+            wadAvatar
 
-            HStack(spacing: 10) {
-                ChatActionButton(title: scenario.actions.primary, filled: true)
-                ChatActionButton(title: scenario.actions.secondary, filled: false)
+            VStack(alignment: .leading, spacing: 14) {
+                if message.isTyping {
+                    TypingIndicator()
+                } else {
+                    Text(message.text)
+                        .font(.system(size: 14))
+                        .foregroundStyle(Color.alinma.assistantInk)
+                        .lineSpacing(3)
+                }
+
+                if message.actions.count >= 2 {
+                    HStack(spacing: 10) {
+                        ChatActionButton(title: message.actions[0], filled: true)
+                        ChatActionButton(title: message.actions[1], filled: false)
+                    }
+                }
             }
+            .padding(16)
+            .background(WadhahTheme.assistantBubble, in: RoundedRectangle(cornerRadius: 18))
         }
-        .padding(16)
-        .background(WadhahTheme.assistantBubble, in: RoundedRectangle(cornerRadius: 18))
         .frame(maxWidth: .infinity, alignment: .leading)
-        .padding(.trailing, 32)
+        .padding(.trailing, 24)
+    }
+
+    /// Wadhah logo as the assistant's bubble avatar.
+    private var wadAvatar: some View {
+        Image("Wad")
+            .resizable()
+            .scaledToFit()
+            .frame(width: 17, height: 17)
+            .frame(width: 26, height: 26)
+            .background(Color.alinma.copper, in: Circle())
     }
 
     // MARK: Input bar
@@ -86,10 +149,9 @@ struct WadhahChatView: View {
                 .padding(.horizontal, 16)
                 .frame(height: 46)
                 .background(WadhahTheme.card, in: Capsule())
+                .onSubmit(send)
 
-            Button {
-                draft = ""
-            } label: {
+            Button(action: send) {
                 Image(systemName: "paperplane.fill")
                     .font(.system(size: 15))
                     .foregroundStyle(.white)
@@ -103,7 +165,14 @@ struct WadhahChatView: View {
         .padding(.vertical, 10)
         .background(WadhahTheme.background)
     }
+
+    private func send() {
+        engine.send(draft)
+        draft = ""
+    }
 }
+
+// MARK: - Pieces
 
 private struct ChatActionButton: View {
     let title: String
@@ -124,5 +193,28 @@ private struct ChatActionButton: View {
                     }
                 }
         }
+    }
+}
+
+private struct TypingIndicator: View {
+    @State private var animating = false
+
+    var body: some View {
+        HStack(spacing: 5) {
+            ForEach(0..<3, id: \.self) { index in
+                Circle()
+                    .fill(Color(hex: 0xB7AB9E))
+                    .frame(width: 7, height: 7)
+                    .opacity(animating ? 1 : 0.25)
+                    .animation(
+                        .easeInOut(duration: 0.6)
+                            .repeatForever(autoreverses: true)
+                            .delay(Double(index) * 0.2),
+                        value: animating
+                    )
+            }
+        }
+        .padding(.vertical, 4)
+        .onAppear { animating = true }
     }
 }

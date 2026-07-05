@@ -3,19 +3,17 @@ import SwiftUI
 // MARK: - Screen 2: Transaction History (سجل العمليات)
 
 struct TransactionHistoryView: View {
+    @EnvironmentObject private var store: BankStore
+
     var body: some View {
         ScrollView {
             VStack(spacing: 12) {
-                ForEach(DummyData.recentTransactions) { transaction in
-                    if let scenario = transaction.scenario {
-                        NavigationLink(value: Route.chat(scenario)) {
-                            TransactionRow(transaction: transaction, showsWadhahPill: true)
-                        }
-                        .buttonStyle(.plain)
-                    } else {
-                        // No scripted scenario — pill still shown as the universal entry point.
+                ForEach(store.recentTransactions) { transaction in
+                    // Every row opens Wadhah; unscripted ones get the generic assistant greeting.
+                    NavigationLink(value: Route.chat(transaction.scenario)) {
                         TransactionRow(transaction: transaction, showsWadhahPill: true)
                     }
+                    .buttonStyle(.plain)
                 }
             }
             .padding(16)

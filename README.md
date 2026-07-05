@@ -39,14 +39,34 @@ SwiftUI drives the native iOS experience, while Kotlin Multiplatform hosts the p
 ```
 WadhahApp/
 ├── WadhahApp.swift            # App entry point & navigation routes
-├── Theme.swift                # Colors, corner radius, shared styling
+├── AlinmaColors.swift         # Alinma brand palette (Color.alinma.*)
+├── Theme.swift                # Corner radius + theme aliases over the palette
 ├── Models.swift               # Transaction, ChatScenario, dummy data
+├── BankStore.swift            # Swift mirror of the KMP repository/assistant
 ├── Components.swift           # TransactionRow, WadhahPill, WadhahTabBar
-├── HomeView.swift             # Screen 1: Home dashboard
+├── DashboardView.swift        # Screen 1: Home dashboard (BankStore-driven)
 ├── TransactionHistoryView.swift # Screen 2: Transaction history
-├── WadhahChatView.swift       # Screens 3 & 4: Wadhah chat scenarios
+├── WadhahChatView.swift       # Screens 3 & 4: Wadhah chat (push or bottom sheet)
 └── Assets.xcassets            # banklogo, Wad, car & airalo banners
+
+shared/                        # Kotlin Multiplatform module
+└── src/commonMain/kotlin/com/wadhah/shared/
+    ├── model/                 # Account, BankTransaction, ChatMessage
+    ├── data/MockBankRepository.kt   # Dummy balances & transactions
+    └── chat/WadhahAssistant.kt      # Scripted assistant orchestration
 ```
+
+### Building the KMP framework (macOS)
+
+```
+gradle wrapper                                        # once, to generate ./gradlew
+./gradlew :shared:assembleWadhahSharedReleaseXCFramework
+```
+
+Then link `shared/build/XCFrameworks/release/WadhahShared.xcframework` into the
+Xcode project and replace the mirrors in `BankStore.swift` with the shared APIs
+(`MockBankRepository`, `WadhahAssistant`). The `:shared` module also has a `jvm()`
+target so the Kotlin code builds and tests on any machine.
 
 ## Roadmap
 

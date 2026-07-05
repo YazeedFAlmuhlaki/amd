@@ -17,7 +17,7 @@ struct WadhahPill: View {
         .foregroundStyle(.white)
         .padding(.horizontal, 14)
         .padding(.vertical, 7)
-        .background(Color(hex: 0xD17D58), in: Capsule())
+        .background(Color.alinma.copper, in: Capsule())
     }
 }
 
