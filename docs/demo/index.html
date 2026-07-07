@@ -1,0 +1,565 @@
+<!DOCTYPE html>
+<html dir="rtl" lang="ar">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>وضّح — Wadhah Mockup</title>
+<style>
+  :root {
+    --bg: #0B1F32;
+    --card: #122B40;
+    --card-elev: #1A3B50;
+    --accent: #E65C00;
+    --copper: #D17D58;
+    --user-bubble: #1E63D0;
+    --assist-bubble: #F4EDE6;
+    --lavender: #8B7BC7;
+    --text: #FFFFFF;
+    --text-2: rgba(255,255,255,.55);
+    --radius: 16px;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-font-smoothing: antialiased; }
+  html, body { height: 100%; }
+  body {
+    background: #D3DAE6;
+    font-family: -apple-system, "SF Pro Text", "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+    display: flex; align-items: center; justify-content: center;
+    overflow: hidden;
+  }
+  #scaler { transform-origin: center center; }
+
+  /* ---------- Phone frame ---------- */
+  .phone {
+    width: 393px; height: 852px;
+    background: var(--bg);
+    border: 13px solid #0c0c0e;
+    border-radius: 58px;
+    box-shadow: 0 30px 70px rgba(20,35,60,.45);
+    position: relative;
+    overflow: hidden;
+  }
+  .island {
+    position: absolute; top: 12px; left: 50%; transform: translateX(-50%);
+    width: 118px; height: 34px; border-radius: 20px; background: #000;
+    z-index: 50;
+  }
+
+  /* ---------- Screens / router ---------- */
+  .screen {
+    position: absolute; inset: 0;
+    display: none; flex-direction: column;
+    background: var(--bg);
+  }
+  .screen.active { display: flex; animation: fadeIn .22s ease; }
+  @keyframes fadeIn { from { opacity: .35; } to { opacity: 1; } }
+
+  .scroll { flex: 1; overflow-y: auto; scrollbar-width: none; }
+  .scroll::-webkit-scrollbar { display: none; }
+
+  /* ---------- Shared ---------- */
+  .icon { width: 1em; height: 1em; stroke: currentColor; fill: none; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; display: block; }
+  .icon.filled { fill: currentColor; stroke: none; }
+  .num { direction: ltr; unicode-bidi: embed; }
+
+  .circle-btn {
+    width: 44px; height: 44px; border-radius: 50%;
+    background: var(--card); color: var(--text);
+    display: flex; align-items: center; justify-content: center;
+    border: none; cursor: pointer; font-size: 17px; flex: none;
+  }
+
+  /* ---------- Home ---------- */
+  .home-content { padding: 60px 16px 24px; display: flex; flex-direction: column; gap: 20px; }
+
+  .header-row { display: flex; align-items: center; gap: 12px; }
+  .bank-logo {
+    width: 52px; height: 52px; border-radius: 16px; object-fit: cover;
+    background: #fff; flex: none;
+  }
+  .greeting .hi { font-size: 13px; color: var(--text-2); }
+  .greeting .name { font-size: 19px; font-weight: 700; color: var(--text); margin-top: 2px; }
+  .spacer { flex: 1; }
+
+  .bell-wrap { position: relative; }
+  .bell-dot {
+    position: absolute; top: 5px; right: 5px;
+    width: 9px; height: 9px; border-radius: 50%; background: var(--accent);
+  }
+
+  .points-pill {
+    align-self: flex-start;
+    display: inline-flex; align-items: center; gap: 6px;
+    background: rgba(139,123,199,.45); color: #fff;
+    font-size: 13px; font-weight: 700;
+    padding: 7px 14px; border-radius: 100px;
+    margin-top: -6px;
+  }
+  .points-pill .icon { font-size: 11px; }
+
+  .balance-card {
+    background: var(--card); border-radius: var(--radius);
+    padding: 20px; display: flex; flex-direction: column; gap: 14px;
+  }
+  .balance-card .label { font-size: 14px; color: var(--text-2); }
+  .balance-row { display: flex; align-items: baseline; gap: 8px; }
+  .balance-row .amount { font-size: 34px; font-weight: 800; color: var(--text); }
+  .balance-row .cur { font-size: 16px; font-weight: 600; color: var(--text-2); }
+  .card-meta { display: flex; justify-content: space-between; font-size: 12px; color: var(--text-2); }
+
+  .quick-actions { display: flex; gap: 12px; }
+  .qa {
+    flex: 1; height: 96px; background: var(--card); border-radius: var(--radius);
+    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px;
+    cursor: pointer;
+  }
+  .qa .qa-icon {
+    width: 44px; height: 44px; border-radius: 50%;
+    background: rgba(11,31,50,.6); color: var(--accent);
+    display: flex; align-items: center; justify-content: center; font-size: 20px;
+  }
+  .qa .qa-label {
+    font-size: 10px; font-weight: 500; color: var(--text);
+    text-align: center; line-height: 1.35; padding: 0 4px;
+  }
+
+  .banner { width: 100%; border-radius: var(--radius); display: block; cursor: pointer; }
+
+  .tx-header { display: flex; align-items: baseline; justify-content: space-between; }
+  .tx-header .title { font-size: 16px; font-weight: 700; color: var(--text); }
+  .tx-header .sub { font-size: 11px; color: var(--text-2); }
+
+  .tx-row {
+    background: var(--card); border-radius: var(--radius);
+    padding: 14px; display: flex; flex-direction: column; gap: 10px;
+  }
+  .tx-main { display: flex; align-items: center; gap: 12px; }
+  .tx-icon {
+    width: 40px; height: 40px; border-radius: 12px; flex: none;
+    background: var(--card-elev); color: var(--accent);
+    display: flex; align-items: center; justify-content: center; font-size: 16px;
+  }
+  .tx-icon.round { border-radius: 50%; width: 44px; height: 44px; border: 1px solid rgba(255,255,255,.12); }
+  .tx-info { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
+  .tx-info .m { font-size: 14px; font-weight: 700; color: var(--text); }
+  .tx-info .s { font-size: 11px; color: var(--text-2); }
+  .tx-amt {
+    margin-inline-start: auto; display: flex; align-items: center; gap: 6px;
+    direction: ltr; flex: none;
+  }
+  .tx-amt .chev { color: var(--text-2); font-size: 11px; }
+  .tx-amt .a { font-size: 14px; font-weight: 600; color: var(--text); white-space: nowrap; }
+
+  .wadhah-pill {
+    align-self: flex-start; /* RTL: leading = right… screenshot shows bottom-left, so use flex-end */
+    display: inline-flex; align-items: center; gap: 5px;
+    background: var(--copper); color: #fff;
+    font-size: 13px; font-weight: 700;
+    padding: 5px 14px 5px 8px; border-radius: 100px;
+    border: none; cursor: pointer;
+  }
+  .pill-holder { display: flex; justify-content: flex-end; }
+  .wadhah-pill img { width: 22px; height: 22px; border-radius: 50%; object-fit: cover; }
+
+  .cta {
+    height: 48px; border-radius: 14px; background: var(--accent);
+    color: #fff; font-size: 15px; font-weight: 700;
+    border: none; cursor: pointer; width: 100%;
+    font-family: inherit;
+  }
+
+  .tabbar {
+    display: flex; background: var(--card); padding: 10px 4px 22px;
+    flex: none;
+  }
+  .tab {
+    flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px;
+    color: var(--text-2); font-size: 10px; cursor: pointer; background: none; border: none;
+    font-family: inherit;
+  }
+  .tab .icon { font-size: 19px; }
+  .tab.active { color: var(--accent); }
+
+  /* ---------- History ---------- */
+  .nav-head {
+    display: flex; align-items: center; gap: 14px;
+    padding: 58px 16px 14px;
+    flex: none;
+  }
+  .nav-head .title { font-size: 21px; font-weight: 700; color: var(--text); }
+  .history-list { padding: 4px 16px 24px; display: flex; flex-direction: column; gap: 12px; }
+  .history-list .tx-info .m { font-size: 15px; }
+
+  /* ---------- Chat ---------- */
+  .chat-head {
+    display: flex; align-items: center; gap: 10px;
+    padding: 58px 16px 12px;
+    border-bottom: 1px solid rgba(255,255,255,.07);
+    flex: none;
+  }
+  .chat-head .title { font-size: 17px; font-weight: 700; color: var(--text); }
+  .wad-avatar {
+    width: 38px; height: 38px; border-radius: 50%;
+    background: var(--copper);
+    display: flex; align-items: center; justify-content: center; flex: none;
+  }
+  .wad-avatar img { width: 26px; height: 26px; object-fit: contain; }
+
+  .chat-scroll { padding: 16px; display: flex; flex-direction: column; gap: 14px; }
+
+  .msg-user {
+    align-self: flex-end; /* RTL flex-end = left… we want RIGHT per screenshot → flex-start */
+    background: var(--user-bubble); color: #fff;
+    font-size: 14px; font-weight: 500; line-height: 1.6;
+    padding: 12px 14px; border-radius: 18px;
+    max-width: 78%;
+  }
+  .msg-row-user { display: flex; justify-content: flex-start; }
+  .msg-row-assist { display: flex; justify-content: flex-end; gap: 8px; align-items: flex-end; }
+
+  .msg-assist {
+    background: var(--assist-bubble); color: #2A2A2A;
+    font-size: 14px; line-height: 1.75;
+    padding: 16px; border-radius: 18px;
+    max-width: 88%;
+    display: flex; flex-direction: column; gap: 14px;
+  }
+  .msg-actions { display: flex; gap: 8px; flex-wrap: nowrap; }
+  .chat-btn {
+    font-size: 12px; font-weight: 700; padding: 10px 13px;
+    border-radius: 100px; cursor: pointer; font-family: inherit;
+    white-space: nowrap;
+  }
+  .chat-btn.primary { background: var(--copper); color: #fff; border: none; }
+  .chat-btn.secondary { background: #fff; color: #2A2A2A; border: 1.2px solid #C9C2BA; }
+
+  .msg-avatar {
+    width: 26px; height: 26px; border-radius: 50%; background: var(--copper);
+    display: flex; align-items: center; justify-content: center; flex: none;
+  }
+  .msg-avatar img { width: 17px; height: 17px; object-fit: contain; }
+
+  .msg-time { font-size: 10px; color: var(--text-2); }
+
+  .typing { display: inline-flex; gap: 4px; padding: 4px 2px; }
+  .typing span {
+    width: 7px; height: 7px; border-radius: 50%; background: #B7AB9E;
+    animation: blink 1.2s infinite;
+  }
+  .typing span:nth-child(2) { animation-delay: .2s; }
+  .typing span:nth-child(3) { animation-delay: .4s; }
+  @keyframes blink { 0%, 70%, 100% { opacity: .25; } 35% { opacity: 1; } }
+
+  .chat-input {
+    display: flex; gap: 10px; align-items: center;
+    padding: 10px 16px 26px; flex: none; background: var(--bg);
+  }
+  .chat-input input {
+    flex: 1; height: 46px; border-radius: 100px;
+    background: var(--card); border: none; outline: none;
+    color: var(--text); font-size: 13px; font-family: inherit;
+    padding: 0 18px;
+  }
+  .chat-input input::placeholder { color: var(--text-2); }
+  .send-btn {
+    width: 46px; height: 46px; border-radius: 50%; flex: none;
+    background: var(--accent); color: #fff; border: none; cursor: pointer;
+    display: flex; align-items: center; justify-content: center; font-size: 15px;
+  }
+  .send-btn .icon { transform: scaleX(-1); }
+
+  /* ---------- Toast ---------- */
+  .toast {
+    position: absolute; bottom: 110px; left: 50%; transform: translateX(-50%) translateY(8px);
+    background: rgba(10,22,36,.92); color: #fff;
+    font-size: 12.5px; font-weight: 600;
+    padding: 10px 18px; border-radius: 100px;
+    border: 1px solid rgba(255,255,255,.12);
+    opacity: 0; pointer-events: none; transition: all .25s ease;
+    z-index: 60; white-space: nowrap;
+  }
+  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+</style>
+</head>
+<body>
+
+<!-- SF-Symbol-style icon set -->
+<svg width="0" height="0" style="position:absolute">
+  <defs>
+    <symbol id="i-bell" viewBox="0 0 24 24"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 8-3 8h18s-3-1-3-8"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></symbol>
+    <symbol id="i-sparkle" viewBox="0 0 24 24"><path d="M12 3l2.1 6.9L21 12l-6.9 2.1L12 21l-2.1-6.9L3 12l6.9-2.1z"/></symbol>
+    <symbol id="i-receipt" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M16 13H8"/><path d="M16 17H8"/></symbol>
+    <symbol id="i-transfer" viewBox="0 0 24 24"><path d="M17 2l4 4-4 4"/><path d="M21 6H8a4 4 0 0 0-4 4"/><path d="M7 22l-4-4 4-4"/><path d="M3 18h13a4 4 0 0 0 4-4"/></symbol>
+    <symbol id="i-phone" viewBox="0 0 24 24"><rect x="7" y="2" width="10" height="20" rx="2.5"/><path d="M10.5 18.5h3"/></symbol>
+    <symbol id="i-car" viewBox="0 0 24 24"><path d="M4 16v-4.5L6 6.8A2 2 0 0 1 7.8 5.5h8.4A2 2 0 0 1 18 6.8l2 4.7V16"/><path d="M4 11.5h16"/><circle cx="7" cy="16" r="1.9"/><circle cx="17" cy="16" r="1.9"/><path d="M9 16h6"/></symbol>
+    <symbol id="i-house" viewBox="0 0 24 24"><path d="M3 10.5L12 3l9 7.5"/><path d="M5.5 8.8V21h13V8.8"/><path d="M10 21v-5h4v5"/></symbol>
+    <symbol id="i-cardpay" viewBox="0 0 24 24"><rect x="2.5" y="5" width="19" height="14" rx="2.5"/><path d="M2.5 10h19"/></symbol>
+    <symbol id="i-bag" viewBox="0 0 24 24"><path d="M6.5 7.5h11L18.5 21h-13z"/><path d="M9 7.5V6a3 3 0 0 1 6 0v1.5"/></symbol>
+    <symbol id="i-grid" viewBox="0 0 24 24"><rect x="3.5" y="3.5" width="7" height="7" rx="1.5"/><rect x="13.5" y="3.5" width="7" height="7" rx="1.5"/><rect x="3.5" y="13.5" width="7" height="7" rx="1.5"/><rect x="13.5" y="13.5" width="7" height="7" rx="1.5"/></symbol>
+    <symbol id="i-chevron-l" viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></symbol>
+    <symbol id="i-plane" viewBox="0 0 24 24"><path d="M22 2L11 13"/><path d="M22 2l-7 20-4-9-9-4z"/></symbol>
+    <symbol id="i-basket" viewBox="0 0 24 24"><path d="M4.5 9h15l-1.6 11H6.1z"/><path d="M8.5 9L12 3.5 15.5 9"/></symbol>
+    <symbol id="i-fork" viewBox="0 0 24 24"><path d="M7.5 3v5a2.5 2.5 0 0 0 5 0V3"/><path d="M10 13v8"/><path d="M10 10.5V13"/><path d="M16.5 3v18"/><path d="M16.5 3c2.8 2.3 2.8 6.8 0 9"/></symbol>
+    <symbol id="i-fuel" viewBox="0 0 24 24"><path d="M4 21V6a2 2 0 0 1 2-2h5a2 2 0 0 1 2 2v15"/><path d="M3 21h11"/><path d="M13 10h2.5A1.5 1.5 0 0 1 17 11.5V17a1.5 1.5 0 0 0 3 0V9.5L18 7"/><rect x="6.5" y="7" width="4" height="4" rx="0.8"/></symbol>
+    <symbol id="i-cup" viewBox="0 0 24 24"><path d="M4.5 8h12v5.5a5 5 0 0 1-5 5h-2a5 5 0 0 1-5-5z"/><path d="M16.5 9.5H18a2.5 2.5 0 0 1 0 5h-1.5"/><path d="M8 4.5V6"/><path d="M11.5 4V6"/></symbol>
+    <symbol id="i-back" viewBox="0 0 24 24"><path d="M4 12h15"/><path d="M13 6l6 6-6 6"/></symbol>
+  </defs>
+</svg>
+
+<div id="scaler">
+  <div class="phone">
+    <div class="island"></div>
+
+    <!-- ============ Screen 1: Home ============ -->
+    <section class="screen active" id="screen-home">
+      <div class="scroll">
+        <div class="home-content">
+
+          <div class="header-row">
+            <img class="bank-logo" src="assets/banklogo.png" alt="بنك الإنماء">
+            <div class="greeting">
+              <div class="hi">مساء الخير</div>
+              <div class="name">مرحبًا أنس 👋</div>
+            </div>
+            <div class="spacer"></div>
+            <div class="bell-wrap">
+              <button class="circle-btn" onclick="toast()"><svg class="icon"><use href="#i-bell"/></svg></button>
+              <div class="bell-dot"></div>
+            </div>
+          </div>
+
+          <div class="points-pill">
+            <svg class="icon filled"><use href="#i-sparkle"/></svg>
+            <span><span class="num">1,330</span> نقطة</span>
+          </div>
+
+          <div class="balance-card">
+            <div class="label">الرصيد الحالي</div>
+            <div class="balance-row">
+              <span class="amount num">18,240.75</span>
+              <span class="cur">SAR</span>
+            </div>
+            <div class="card-meta">
+              <span class="num">•••• 4821</span>
+              <span>صالحة حتى <span class="num">08/28</span></span>
+            </div>
+          </div>
+
+          <div class="quick-actions">
+            <div class="qa" onclick="toast()"><div class="qa-icon"><svg class="icon"><use href="#i-receipt"/></svg></div><div class="qa-label">دفع الفواتير</div></div>
+            <div class="qa" onclick="toast()"><div class="qa-icon"><svg class="icon"><use href="#i-transfer"/></svg></div><div class="qa-label">الحوالات السريعة</div></div>
+            <div class="qa" onclick="toast()"><div class="qa-icon"><svg class="icon"><use href="#i-phone"/></svg></div><div class="qa-label">شحن الجوال</div></div>
+            <div class="qa" onclick="toast()"><div class="qa-icon"><svg class="icon"><use href="#i-car"/></svg></div><div class="qa-label">المخالفات المرورية</div></div>
+          </div>
+
+          <div style="display:flex;flex-direction:column;gap:12px">
+            <img class="banner" src="assets/banner-fantasy.png" alt="الإنماء فانتزي" onclick="toast()">
+            <img class="banner" src="assets/banner-airalo.png" alt="airalo" onclick="toast()">
+          </div>
+
+          <div style="display:flex;flex-direction:column;gap:12px">
+            <div class="tx-header">
+              <span class="title">آخر العمليات</span>
+              <span class="sub">آخر <span class="num">3</span> عمليات</span>
+            </div>
+            <div id="home-tx"></div>
+            <button class="cta" onclick="navigate('screen-history')">عرض الكل</button>
+          </div>
+
+        </div>
+      </div>
+
+      <div class="tabbar">
+        <button class="tab active"><svg class="icon"><use href="#i-house"/></svg><span>الرئيسية</span></button>
+        <button class="tab" onclick="toast()"><svg class="icon"><use href="#i-transfer"/></svg><span>التحويل</span></button>
+        <button class="tab" onclick="toast()"><svg class="icon"><use href="#i-cardpay"/></svg><span>المدفوعات</span></button>
+        <button class="tab" onclick="toast()"><svg class="icon"><use href="#i-bag"/></svg><span>المتجر</span></button>
+        <button class="tab" onclick="toast()"><svg class="icon"><use href="#i-grid"/></svg><span>الخدمات</span></button>
+      </div>
+    </section>
+
+    <!-- ============ Screen 2: History ============ -->
+    <section class="screen" id="screen-history">
+      <div class="nav-head">
+        <button class="circle-btn" onclick="goBack()"><svg class="icon"><use href="#i-back"/></svg></button>
+        <span class="title">سجل العمليات</span>
+      </div>
+      <div class="scroll">
+        <div class="history-list" id="history-list"></div>
+      </div>
+    </section>
+
+    <!-- ============ Screens 3/4: Wadhah Chat ============ -->
+    <section class="screen" id="screen-chat">
+      <div class="chat-head">
+        <button class="circle-btn" onclick="goBack()"><svg class="icon"><use href="#i-back"/></svg></button>
+        <div class="wad-avatar"><img src="assets/wad.png" alt="وضح"></div>
+        <span class="title">وضّح - مساعدك البنكي</span>
+      </div>
+      <div class="scroll" id="chat-scroll-wrap">
+        <div class="chat-scroll" id="chat-thread"></div>
+      </div>
+      <div class="chat-input">
+        <input id="chat-field" type="text" placeholder="اسأل عن عملية أو رسوم أو اشتراك..."
+               onkeydown="if(event.key==='Enter')sendMessage()">
+        <button class="send-btn" onclick="sendMessage()"><svg class="icon"><use href="#i-plane"/></svg></button>
+      </div>
+    </section>
+
+    <div class="toast" id="toast">نسخة تجريبية للعرض ✨</div>
+  </div>
+</div>
+
+<script>
+/* ---------------- Data (mirrors Models.swift) ---------------- */
+const HOME_TX = [
+  { m: "آبل",          s: "اليوم · 9:15 ص", a: "-3.69 SAR",  icon: "i-phone"  },
+  { m: "ثمار التنمية", s: "أمس · 8:30 م",   a: "-84.00 SAR", icon: "i-basket" },
+  { m: "هنقرستيشن",    s: "قبل يومين",       a: "-50.84 SAR", icon: "i-fork"   },
+];
+
+const HISTORY_TX = [
+  { m: "APPLE COM BILL",             s: "خدمات وتطبيقات إلكترونية · اليوم · 9:15 ص", a: "-3.69 SAR",   icon: "i-phone",  sc: "apple"  },
+  { m: "شركة ثمار التنمية للتجارة", s: "نقاط بيع - مدى · أمس · 8:30 م",             a: "-84.00 SAR",  icon: "i-basket", sc: "thamar" },
+  { m: "HUNGERSTATION LLC",          s: "توصيل طعام · قبل يومين",                    a: "-50.84 SAR",  icon: "i-fork",   sc: null     },
+  { m: "NAFT SERVICES CO",           s: "محطة وقود · قبل ٣ أيام",                    a: "-120.00 SAR", icon: "i-fuel",   sc: null     },
+  { m: "ELIXIR BUN CO",              s: "قهوة مختصة · قبل ٤ أيام",                   a: "-26.00 SAR",  icon: "i-cup",    sc: null     },
+];
+
+const SCENARIOS = {
+  apple: {
+    user: "وشو تاجر (آبل كوم بيل) اللي خصم مني؟",
+    assistant: "هذه عملية شراء أو تجديد اشتراك من شركة آبل، ومصنفة عندنا كخدمات وتطبيقات إلكترونية (مثل زيادة مساحة تخزين الهاتف أو اشتراك تطبيق). انخصم مبلغ 3.69 ريال اليوم الساعة 9:15 صباحاً.\nحاب تصعد الموضوع لخدمة العملاء أو تبغى ترفع اعتراض؟",
+    actions: ["تصعيد لخدمة العملاء", "اعتراض على العملية"],
+  },
+  thamar: {
+    user: "مكتوب بالعملية (شركة ثمار التنمية للتجارة) ومخصوم 84 ريال، أنا ما رحت هالشركة!",
+    assistant: "تم التأكد من العملية؛ هذا الاسم التجاري مسجل لجهاز نقاط البيع الخاص بـ سوبرماركت أسواق النخبة (فرع حي الياسمين).\nتم دفع مبلغ 84 ريال عبر بطاقتك (مدى) بمسح الجهاز مباشرة، بتاريخ أمس الساعة 8:30 مساءً.\nحاب نفتح لك خريطة موقع المحل للتأكد؟",
+    actions: ["موقع المحل على الخريطة", "تقديم اعتراض"],
+  },
+};
+
+function genericScenario(merchant) {
+  return {
+    user: "وضح لي عملية (" + merchant + ") اللي انخصمت مني؟",
+    assistant: "هذه عملية شراء من " + merchant + "، وتم تصنيفها تلقائيًا حسب نوع المتجر.\nهذي نسخة تجريبية للعرض — في التطبيق الفعلي بحلل لك العملية من بيانات حسابك مباشرة 👌",
+    actions: ["تصعيد لخدمة العملاء", "اعتراض على العملية"],
+  };
+}
+
+/* ---------------- Router ---------------- */
+const stack = ["screen-home"];
+function show(id) {
+  document.querySelectorAll(".screen").forEach(s => s.classList.toggle("active", s.id === id));
+}
+function navigate(id) { stack.push(id); show(id); }
+function goBack() {
+  if (stack.length > 1) stack.pop();
+  show(stack[stack.length - 1]);
+}
+
+/* ---------------- Rendering ---------------- */
+function txRowHTML(t, opts) {
+  const roundIcon = opts.round ? " round" : "";
+  const chev = opts.chevron ? '<svg class="icon chev"><use href="#i-chevron-l"/></svg>' : "";
+  const pill = opts.pill
+    ? '<div class="pill-holder"><button class="wadhah-pill" onclick="openChat(\'' + (t.sc || "") + '\',\'' + t.m.replace(/'/g, "") + '\')">' +
+      '<span>وضح</span><img src="assets/wad.png" alt=""></button></div>'
+    : "";
+  return (
+    '<div class="tx-row">' +
+      '<div class="tx-main">' +
+        '<div class="tx-icon' + roundIcon + '"><svg class="icon"><use href="#' + t.icon + '"/></svg></div>' +
+        '<div class="tx-info"><span class="m">' + t.m + '</span><span class="s">' + t.s + "</span></div>" +
+        '<div class="tx-amt">' + chev + '<span class="a">' + t.a + "</span></div>" +
+      "</div>" + pill +
+    "</div>"
+  );
+}
+
+document.getElementById("home-tx").innerHTML =
+  '<div style="display:flex;flex-direction:column;gap:12px">' +
+  HOME_TX.map(t => txRowHTML(t, { round: false, chevron: false, pill: false })).join("") +
+  "</div>";
+
+document.getElementById("history-list").innerHTML =
+  HISTORY_TX.map(t => txRowHTML(t, { round: true, chevron: true, pill: true })).join("");
+
+/* ---------------- Chat ---------------- */
+const thread = document.getElementById("chat-thread");
+
+function bubbleUser(text) {
+  return '<div class="msg-row-user"><div class="msg-user">' + text + "</div></div>";
+}
+function bubbleAssistant(text, actions) {
+  const btns = actions && actions.length
+    ? '<div class="msg-actions">' +
+      '<button class="chat-btn primary" onclick="toast()">' + actions[0] + "</button>" +
+      '<button class="chat-btn secondary" onclick="toast()">' + actions[1] + "</button>" +
+      "</div>"
+    : "";
+  return (
+    '<div class="msg-row-assist">' +
+      '<div class="msg-assist"><div>' + text.replace(/\n/g, "<br>") + "</div>" + btns + "</div>" +
+      '<div class="msg-avatar"><img src="assets/wad.png" alt=""></div>' +
+    "</div>"
+  );
+}
+
+function openChat(scenarioKey, merchant) {
+  const sc = SCENARIOS[scenarioKey] || genericScenario(merchant || "المتجر");
+  thread.innerHTML =
+    bubbleUser(sc.user) +
+    bubbleAssistant(sc.assistant, sc.actions) +
+    '<div class="msg-time">وضح · الآن</div>';
+  navigate("screen-chat");
+  scrollChat();
+}
+
+function scrollChat() {
+  const w = document.getElementById("chat-scroll-wrap");
+  w.scrollTop = w.scrollHeight;
+}
+
+function sendMessage() {
+  const field = document.getElementById("chat-field");
+  const text = field.value.trim();
+  if (!text) return;
+  field.value = "";
+  thread.insertAdjacentHTML("beforeend", bubbleUser(text));
+  scrollChat();
+
+  const typingId = "typing-" + Date.now();
+  thread.insertAdjacentHTML("beforeend",
+    '<div class="msg-row-assist" id="' + typingId + '">' +
+      '<div class="msg-assist"><div class="typing"><span></span><span></span><span></span></div></div>' +
+      '<div class="msg-avatar"><img src="assets/wad.png" alt=""></div>' +
+    "</div>");
+  scrollChat();
+
+  setTimeout(() => {
+    document.getElementById(typingId).remove();
+    thread.insertAdjacentHTML("beforeend",
+      bubbleAssistant("استلمت سؤالك 👌 هذي نسخة تجريبية من وضّح — في التطبيق الفعلي بجاوبك من بيانات حسابك وسجل عملياتك مباشرة.", null) +
+      '<div class="msg-time">وضح · الآن</div>');
+    scrollChat();
+  }, 1100);
+}
+
+/* ---------------- Toast + scaling ---------------- */
+let toastTimer;
+function toast() {
+  const t = document.getElementById("toast");
+  t.classList.add("show");
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove("show"), 1600);
+}
+
+function fit() {
+  const s = Math.min(1, (window.innerHeight - 28) / 880, (window.innerWidth - 28) / 421);
+  document.getElementById("scaler").style.transform = "scale(" + s + ")";
+}
+window.addEventListener("resize", fit);
+fit();
+</script>
+</body>
+</html>

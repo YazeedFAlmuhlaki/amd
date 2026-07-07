@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>وضّح — Wadhah | مساعدك البنكي الذكي</title>
+<meta name="description" content="Wadhah (وضّح) — a generative AI assistant inside the banking app that turns confusing bank statements into clear, human answers.">
+<link rel="icon" href="assets/wad.png" type="image/png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0A0A0C;
+    --surface: #111114;
+    --surface-2: #16161A;
+    --border: rgba(255, 255, 255, 0.10);
+    --border-strong: rgba(255, 255, 255, 0.18);
+    --text: #F5F6F7;
+    --muted: #9BA0A8;
+    --radius: 18px;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: "Inter", "IBM Plex Sans Arabic", "Segoe UI", -apple-system, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    line-height: 1.6;
+  }
+  html[lang="ar"] body { font-family: "IBM Plex Sans Arabic", "Inter", "Segoe UI", Tahoma, sans-serif; }
+
+  .container { max-width: 1100px; margin: 0 auto; padding: 0 24px; }
+  section { padding: 88px 0; }
+  a { color: inherit; text-decoration: none; }
+  img { max-width: 100%; }
+
+  .kicker {
+    display: inline-block;
+    font-size: 12px; font-weight: 600; letter-spacing: 0.14em;
+    color: var(--muted); text-transform: uppercase;
+    border: 1px solid var(--border); border-radius: 100px;
+    padding: 7px 16px; margin-bottom: 22px;
+  }
+  h2.section-title { font-size: clamp(26px, 4vw, 38px); font-weight: 700; margin-bottom: 14px; }
+  p.section-sub { color: var(--muted); font-size: 16px; max-width: 640px; margin-bottom: 44px; }
+
+  /* ---------- Nav ---------- */
+  nav {
+    position: sticky; top: 0; z-index: 100;
+    background: rgba(10, 10, 12, 0.82); backdrop-filter: blur(14px);
+    border-bottom: 1px solid var(--border);
+  }
+  .nav-inner { display: flex; align-items: center; gap: 28px; height: 64px; }
+  .brand { display: flex; align-items: center; gap: 10px; font-weight: 700; font-size: 17px; }
+  .brand img { width: 26px; height: 26px; }
+  .nav-links { display: flex; gap: 24px; font-size: 13.5px; color: var(--muted); }
+  .nav-links a:hover { color: var(--text); }
+  .nav-spacer { flex: 1; }
+  .lang-btn, .gh-btn {
+    font: inherit; font-size: 13px; font-weight: 600;
+    color: var(--text); background: none;
+    border: 1px solid var(--border-strong); border-radius: 100px;
+    padding: 7px 16px; cursor: pointer;
+  }
+  .lang-btn:hover, .gh-btn:hover { background: rgba(255, 255, 255, 0.06); }
+
+  /* ---------- Hero ---------- */
+  .hero { padding: 110px 0 96px; text-align: center; position: relative; overflow: hidden; }
+  .hero::before {
+    content: ""; position: absolute; inset: auto 0 -40%;
+    height: 70%; pointer-events: none;
+    background: radial-gradient(ellipse at center, rgba(255, 255, 255, 0.05), transparent 65%);
+  }
+  /* Brand lockup — always LTR, mirrors the official logo */
+  .lockup {
+    direction: ltr;
+    display: flex; align-items: center; justify-content: center; gap: 26px;
+    margin-bottom: 46px;
+  }
+  .lockup img { width: clamp(84px, 12vw, 128px); height: auto; }
+  .lockup .words { text-align: left; }
+  .lockup .en { font-family: "Inter", sans-serif; font-size: clamp(48px, 9vw, 84px); font-weight: 800; letter-spacing: -0.03em; line-height: 1; }
+  .lockup .ar { font-family: "IBM Plex Sans Arabic", sans-serif; font-size: clamp(24px, 4vw, 38px); font-weight: 600; color: var(--muted); margin-top: 8px; }
+  .hero h1 { font-size: clamp(26px, 4.6vw, 44px); font-weight: 700; max-width: 800px; margin: 0 auto 18px; line-height: 1.35; }
+  .hero .sub { color: var(--muted); font-size: clamp(15px, 2vw, 18px); max-width: 660px; margin: 0 auto 40px; }
+  .cta-row { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; }
+  .btn {
+    display: inline-flex; align-items: center; gap: 8px;
+    font-size: 15px; font-weight: 600; border-radius: 100px;
+    padding: 14px 30px; cursor: pointer; border: none; font-family: inherit;
+  }
+  .btn.primary { background: #fff; color: #0A0A0C; }
+  .btn.primary:hover { background: #E8E8EA; }
+  .btn.ghost { background: none; color: var(--text); border: 1px solid var(--border-strong); }
+  .btn.ghost:hover { background: rgba(255, 255, 255, 0.06); }
+
+  /* ---------- Problem / Solution ---------- */
+  .duo { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+  .duo-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 34px;
+  }
+  .duo-card .tag {
+    display: inline-block; font-size: 11px; font-weight: 700; letter-spacing: 0.12em;
+    text-transform: uppercase; color: var(--muted);
+    border: 1px solid var(--border); border-radius: 100px;
+    padding: 5px 13px; margin-bottom: 18px;
+  }
+  .duo-card h3 { font-size: 21px; font-weight: 700; margin-bottom: 12px; }
+  .duo-card p { color: var(--muted); font-size: 14.5px; }
+  .descriptor {
+    direction: ltr; display: inline-block;
+    font-family: ui-monospace, "Cascadia Code", Consolas, monospace;
+    font-size: 12.5px; color: var(--text);
+    background: var(--surface-2); border: 1px solid var(--border);
+    border-radius: 8px; padding: 3px 9px; margin: 2px;
+  }
+
+  /* ---------- Features ---------- */
+  .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+  .feature {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 30px;
+    transition: border-color 0.2s ease, transform 0.2s ease;
+  }
+  .feature:hover { border-color: var(--border-strong); transform: translateY(-3px); }
+  .feature .ic {
+    width: 46px; height: 46px; border-radius: 13px;
+    border: 1px solid var(--border-strong);
+    display: flex; align-items: center; justify-content: center;
+    margin-bottom: 20px;
+  }
+  .feature .ic svg { width: 21px; height: 21px; stroke: #fff; fill: none; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
+  .feature h3 { font-size: 16.5px; font-weight: 700; margin-bottom: 8px; }
+  .feature p { color: var(--muted); font-size: 13.5px; }
+
+  /* ---------- Demo ---------- */
+  .demo-wrap { display: flex; flex-direction: column; align-items: center; gap: 26px; }
+  .demo-frame {
+    width: min(460px, 92vw); height: 780px;
+    border: none; border-radius: 24px;
+    background: transparent;
+  }
+  .demo-hint {
+    display: flex; align-items: center; gap: 10px;
+    color: var(--muted); font-size: 13.5px;
+    border: 1px solid var(--border); border-radius: 100px;
+    padding: 9px 20px;
+  }
+  .demo-hint img { width: 18px; height: 18px; }
+
+  /* ---------- Tech ---------- */
+  .arch {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 34px; margin-top: 20px;
+    overflow-x: auto;
+  }
+  .arch svg { display: block; margin: 0 auto; min-width: 620px; }
+  .arch text { font-family: inherit; }
+
+  /* ---------- Team ---------- */
+  .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; }
+  .member {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 30px 22px; text-align: center;
+  }
+  .member .avatar {
+    width: 62px; height: 62px; border-radius: 50%;
+    border: 1px solid var(--border-strong);
+    display: flex; align-items: center; justify-content: center;
+    margin: 0 auto 16px;
+  }
+  .member .avatar img { width: 30px; height: 30px; }
+  .member h3 { font-size: 15px; font-weight: 700; }
+  .member p { color: var(--muted); font-size: 12.5px; margin-top: 4px; }
+
+  /* ---------- Footer ---------- */
+  footer { border-top: 1px solid var(--border); padding: 42px 0; }
+  .foot { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+  .foot img { width: 22px; height: 22px; }
+  .foot .name { font-weight: 700; font-size: 15px; }
+  .foot .note { color: var(--muted); font-size: 13px; }
+  .foot .spacer { flex: 1; }
+  .foot a { color: var(--muted); font-size: 13px; border-bottom: 1px solid var(--border); }
+  .foot a:hover { color: var(--text); }
+
+  @media (max-width: 900px) {
+    .grid-3 { grid-template-columns: repeat(2, 1fr); }
+    .grid-4 { grid-template-columns: repeat(2, 1fr); }
+    .duo { grid-template-columns: 1fr; }
+    .nav-links { display: none; }
+  }
+  @media (max-width: 560px) {
+    .grid-3 { grid-template-columns: 1fr; }
+    section { padding: 64px 0; }
+    .lockup { gap: 16px; }
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="container nav-inner">
+    <a class="brand" href="#top">
+      <img src="assets/wad.png" alt="Wadhah">
+      <span>Wadhah</span>
+    </a>
+    <div class="nav-links">
+      <a href="#features" data-i18n="nav_features"></a>
+      <a href="#demo" data-i18n="nav_demo"></a>
+      <a href="#tech" data-i18n="nav_tech"></a>
+      <a href="#team" data-i18n="nav_team"></a>
+    </div>
+    <div class="nav-spacer"></div>
+    <a class="gh-btn" href="https://github.com/anasTrying/amd" target="_blank" rel="noopener">GitHub</a>
+    <button class="lang-btn" id="lang-toggle" onclick="toggleLang()">EN</button>
+  </div>
+</nav>
+
+<!-- ================= Hero ================= -->
+<header class="hero" id="top">
+  <div class="container">
+    <span class="kicker" data-i18n="hero_kicker"></span>
+    <div class="lockup">
+      <img src="assets/wad.png" alt="Wadhah logo">
+      <div class="words">
+        <div class="en">Wadhah</div>
+        <div class="ar">وضح</div>
+      </div>
+    </div>
+    <h1 data-i18n="hero_title"></h1>
+    <p class="sub" data-i18n="hero_sub"></p>
+    <div class="cta-row">
+      <a class="btn primary" href="#demo" data-i18n="hero_cta_demo"></a>
+      <a class="btn ghost" href="https://github.com/anasTrying/amd" target="_blank" rel="noopener" data-i18n="hero_cta_code"></a>
+    </div>
+  </div>
+</header>
+
+<!-- ================= Problem / Solution ================= -->
+<section id="story">
+  <div class="container">
+    <div class="duo">
+      <div class="duo-card">
+        <span class="tag" data-i18n="problem_tag"></span>
+        <h3 data-i18n="problem_title"></h3>
+        <p data-i18n="problem_body"></p>
+        <p style="margin-top:14px">
+          <span class="descriptor">APPLE COM BILL</span>
+          <span class="descriptor">THAMAR AL-TANMIYA TRADING CO</span>
+          <span class="descriptor">ELIXIR BUN CO</span>
+        </p>
+      </div>
+      <div class="duo-card">
+        <span class="tag" data-i18n="solution_tag"></span>
+        <h3 data-i18n="solution_title"></h3>
+        <p data-i18n="solution_body"></p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= Features ================= -->
+<section id="features">
+  <div class="container">
+    <h2 class="section-title" data-i18n="features_title"></h2>
+    <p class="section-sub" data-i18n="features_sub"></p>
+    <div class="grid-3">
+      <div class="feature">
+        <div class="ic"><svg viewBox="0 0 24 24"><path d="M4.5 9h15l-1.6 11H6.1z"/><path d="M8.5 9L12 3.5 15.5 9"/></svg></div>
+        <h3 data-i18n="f1_t"></h3><p data-i18n="f1_b"></p>
+      </div>
+      <div class="feature">
+        <div class="ic"><svg viewBox="0 0 24 24"><path d="M17 2l4 4-4 4"/><path d="M21 6H8a4 4 0 0 0-4 4"/><path d="M7 22l-4-4 4-4"/><path d="M3 18h13a4 4 0 0 0 4-4"/></svg></div>
+        <h3 data-i18n="f2_t"></h3><p data-i18n="f2_b"></p>
+      </div>
+      <div class="feature">
+        <div class="ic"><svg viewBox="0 0 24 24"><rect x="2.5" y="5" width="19" height="14" rx="2.5"/><path d="M2.5 10h19"/></svg></div>
+        <h3 data-i18n="f3_t"></h3><p data-i18n="f3_b"></p>
+      </div>
+      <div class="feature">
+        <div class="ic"><svg viewBox="0 0 24 24"><path d="M21 11.5a8.4 8.4 0 0 1-9 8.4 8.6 8.6 0 0 1-3.2-.6L3 21l1.7-5.1A8.4 8.4 0 1 1 21 11.5z"/></svg></div>
+        <h3 data-i18n="f4_t"></h3><p data-i18n="f4_b"></p>
+      </div>
+      <div class="feature">
+        <div class="ic"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg></div>
+        <h3 data-i18n="f5_t"></h3><p data-i18n="f5_b"></p>
+      </div>
+      <div class="feature">
+        <div class="ic"><svg viewBox="0 0 24 24"><path d="M12 21s-7-5.5-7-11a7 7 0 0 1 14 0c0 5.5-7 11-7 11z"/><circle cx="12" cy="10" r="2.5"/></svg></div>
+        <h3 data-i18n="f6_t"></h3><p data-i18n="f6_b"></p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= Live Demo ================= -->
+<section id="demo">
+  <div class="container">
+    <h2 class="section-title" data-i18n="demo_title"></h2>
+    <p class="section-sub" data-i18n="demo_sub"></p>
+    <div class="demo-wrap">
+      <iframe class="demo-frame" src="demo/" title="Wadhah interactive demo" loading="lazy"></iframe>
+      <div class="demo-hint">
+        <img src="assets/wad.png" alt="">
+        <span data-i18n="demo_hint"></span>
+      </div>
+      <a class="btn ghost" href="demo/" target="_blank" rel="noopener" data-i18n="demo_full"></a>
+    </div>
+  </div>
+</section>
+
+<!-- ================= Tech ================= -->
+<section id="tech">
+  <div class="container">
+    <h2 class="section-title" data-i18n="tech_title"></h2>
+    <p class="section-sub" data-i18n="tech_sub"></p>
+    <div class="grid-3">
+      <div class="feature">
+        <div class="ic"><svg viewBox="0 0 24 24"><rect x="7" y="2" width="10" height="20" rx="2.5"/><path d="M10.5 18.5h3"/></svg></div>
+        <h3>SwiftUI</h3><p data-i18n="tech_swift"></p>
+      </div>
+      <div class="feature">
+        <div class="ic"><svg viewBox="0 0 24 24"><path d="M12 2l9 5v10l-9 5-9-5V7z"/><path d="M12 12l9-5"/><path d="M12 12v10"/><path d="M12 12L3 7"/></svg></div>
+        <h3>Kotlin Multiplatform</h3><p data-i18n="tech_kmp"></p>
+      </div>
+      <div class="feature">
+        <div class="ic"><svg viewBox="0 0 24 24"><path d="M13 2L4 13h6l-1 9 9-11h-6z"/></svg></div>
+        <h3>Flutter</h3><p data-i18n="tech_flutter"></p>
+      </div>
+    </div>
+    <div class="arch">
+      <svg width="760" height="300" viewBox="0 0 760 300" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+            <path d="M0 0L10 5L0 10z" fill="#9BA0A8"/>
+          </marker>
+        </defs>
+        <!-- top: apps -->
+        <rect x="60" y="20" width="280" height="64" rx="14" fill="none" stroke="rgba(255,255,255,.35)"/>
+        <text x="200" y="48" text-anchor="middle" fill="#F5F6F7" font-size="15" font-weight="700">SwiftUI App (iOS)</text>
+        <text x="200" y="68" text-anchor="middle" fill="#9BA0A8" font-size="11.5">main branch</text>
+        <rect x="420" y="20" width="280" height="64" rx="14" fill="none" stroke="rgba(255,255,255,.35)"/>
+        <text x="560" y="48" text-anchor="middle" fill="#F5F6F7" font-size="15" font-weight="700">Flutter App (iOS · Android)</text>
+        <text x="560" y="68" text-anchor="middle" fill="#9BA0A8" font-size="11.5">flutter-wadhah branch</text>
+        <!-- middle: shared core -->
+        <rect x="180" y="128" width="400" height="64" rx="14" fill="rgba(255,255,255,.05)" stroke="rgba(255,255,255,.55)"/>
+        <text x="380" y="156" text-anchor="middle" fill="#F5F6F7" font-size="15" font-weight="700">Shared Core — Kotlin Multiplatform</text>
+        <text x="380" y="176" text-anchor="middle" fill="#9BA0A8" font-size="11.5">models · merchant enrichment · Wadhah assistant orchestration</text>
+        <!-- bottom: data/AI -->
+        <rect x="100" y="236" width="250" height="52" rx="14" fill="none" stroke="rgba(255,255,255,.35)"/>
+        <text x="225" y="267" text-anchor="middle" fill="#F5F6F7" font-size="13.5">Bank account &amp; transaction data</text>
+        <rect x="410" y="236" width="250" height="52" rx="14" fill="none" stroke="rgba(255,255,255,.35)"/>
+        <text x="535" y="267" text-anchor="middle" fill="#F5F6F7" font-size="13.5">Generative AI backend</text>
+        <!-- arrows -->
+        <line x1="230" y1="128" x2="215" y2="84" stroke="#9BA0A8" stroke-width="1.5" marker-end="url(#arr)"/>
+        <line x1="530" y1="128" x2="545" y2="84" stroke="#9BA0A8" stroke-width="1.5" marker-end="url(#arr)"/>
+        <line x1="255" y1="236" x2="300" y2="192" stroke="#9BA0A8" stroke-width="1.5" marker-end="url(#arr)"/>
+        <line x1="505" y1="236" x2="460" y2="192" stroke="#9BA0A8" stroke-width="1.5" marker-end="url(#arr)"/>
+      </svg>
+    </div>
+  </div>
+</section>
+
+<!-- ================= Team ================= -->
+<section id="team">
+  <div class="container">
+    <h2 class="section-title" data-i18n="team_title"></h2>
+    <p class="section-sub" data-i18n="team_sub"></p>
+    <div class="grid-4">
+      <div class="member">
+        <div class="avatar"><img src="assets/wad.png" alt=""></div>
+        <h3 data-i18n="member_placeholder"></h3>
+        <p data-i18n="member_role"></p>
+      </div>
+      <div class="member">
+        <div class="avatar"><img src="assets/wad.png" alt=""></div>
+        <h3 data-i18n="member_placeholder"></h3>
+        <p data-i18n="member_role"></p>
+      </div>
+      <div class="member">
+        <div class="avatar"><img src="assets/wad.png" alt=""></div>
+        <h3 data-i18n="member_placeholder"></h3>
+        <p data-i18n="member_role"></p>
+      </div>
+      <div class="member">
+        <div class="avatar"><img src="assets/wad.png" alt=""></div>
+        <h3 data-i18n="member_placeholder"></h3>
+        <p data-i18n="member_role"></p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="container foot">
+    <img src="assets/wad.png" alt="">
+    <span class="name">Wadhah · وضح</span>
+    <span class="note" data-i18n="footer_note"></span>
+    <span class="spacer"></span>
+    <a href="https://github.com/anasTrying/amd" target="_blank" rel="noopener">github.com/anasTrying/amd</a>
+  </div>
+</footer>
+
+<script>
+const I18N = {
+  ar: {
+    nav_features: 'المميزات',
+    nav_demo: 'التجربة',
+    nav_tech: 'التقنية',
+    nav_team: 'الفريق',
+    hero_kicker: 'هاكاثون عماد ٢٠٢٦',
+    hero_title: 'مساعدك البنكي الذكي… يوضّح لك كل عملية',
+    hero_sub: 'وضّح مساعد ذكاء اصطناعي توليدي مدمج داخل تطبيق البنك، يحوّل كشف الحساب المحيّر إلى إجابات واضحة وإنسانية — مبنية على بياناتك الفعلية، وعلى مدار الساعة.',
+    hero_cta_demo: 'جرّب العرض التفاعلي',
+    hero_cta_code: 'الكود على GitHub',
+    problem_tag: 'المشكلة',
+    problem_title: 'عملية غامضة في الكشف… والعميل يتصل بالبنك',
+    problem_body: 'أسماء التجار في كشف الحساب رموز تجارية غير مفهومة، فما يعرف العميل وش انخصم وليش. النتيجة: قلق، اعتراضات غير ضرورية، وضغط كبير على مراكز الاتصال.',
+    solution_tag: 'الحل',
+    solution_title: 'زر «وضح» على كل عملية',
+    solution_body: 'كل عملية في السجل معها زر وضح يفتح محادثة تشرح العملية بلغة بسيطة: من هو التاجر الفعلي، ليش انخصم المبلغ، وهل هو اشتراك متكرر — مع إجراءات مباشرة مثل الاعتراض أو التصعيد لخدمة العملاء، بدون مغادرة المحادثة.',
+    features_title: 'وش يسوي وضّح؟',
+    features_sub: 'ست قدرات أساسية تحوّل كشف الحساب من لغز إلى حوار واضح.',
+    f1_t: 'تفسير أسماء التجار',
+    f1_b: 'يفك رموز الأسماء التجارية الغامضة ويعرض التاجر الحقيقي وموقعه وقناة الدفع.',
+    f2_t: 'كشف الاشتراكات',
+    f2_b: 'يحدد العمليات المتكررة وأنماط التجديد قبل ما تفاجئك.',
+    f3_t: 'شرح الرسوم والمنتجات',
+    f3_b: 'يجيب على أسئلتك حول رسوم البنك والبطاقات والمنتجات بلغة مفهومة.',
+    f4_t: 'إجراءات داخل المحادثة',
+    f4_b: 'اعتراض على عملية، تصعيد لخدمة العملاء، أو إلغاء اشتراك — من نفس المحادثة.',
+    f5_t: 'إجابات من سياق حسابك',
+    f5_b: 'كل إجابة مبنية على سجل عملياتك الفعلي، مو ردود عامة.',
+    f6_t: 'موقع المتجر على الخريطة',
+    f6_b: 'إذا شكيت في عملية، يفتح لك موقع جهاز نقاط البيع على الخريطة للتأكد.',
+    demo_title: 'جرّبها بنفسك',
+    demo_sub: 'نموذج تفاعلي حي لتطبيق البنك مع وضّح — اضغط وتنقّل مثل ما تسوي في التطبيق.',
+    demo_hint: 'جرّب: اضغط «عرض الكل» ثم زر «وضح» على أي عملية لتشوف السيناريوهات',
+    demo_full: 'افتح العرض في نافذة كاملة',
+    tech_title: 'التقنية والمعمارية',
+    tech_sub: 'واجهات أصلية فوق نواة منطق مشتركة — ونسخة Flutter كاملة على فرع مستقل.',
+    tech_swift: 'واجهة iOS الأصلية (iOS 17+) بواجهة عربية RTL بالكامل.',
+    tech_kmp: 'نواة مشتركة بين المنصات: النماذج، إثراء بيانات التجار، وأوركسترا المساعد.',
+    tech_flutter: 'منفذ كامل متعدد المنصات لنفس التطبيق على فرع flutter-wadhah.',
+    team_title: 'الفريق',
+    team_sub: 'الفريق اللي بنى وضّح في هاكاثون عماد.',
+    member_placeholder: 'عضو الفريق',
+    member_role: '—',
+    footer_note: 'صُنع لهاكاثون عماد ٢٠٢٦',
+  },
+  en: {
+    nav_features: 'Features',
+    nav_demo: 'Live demo',
+    nav_tech: 'Technology',
+    nav_team: 'Team',
+    hero_kicker: 'Amad Hackathon 2026',
+    hero_title: 'The AI banking assistant that makes every transaction make sense',
+    hero_sub: 'Wadhah is a generative AI assistant embedded inside the banking app. It turns confusing bank statements into clear, human answers — grounded in your real account data, around the clock.',
+    hero_cta_demo: 'Try the interactive demo',
+    hero_cta_code: 'Code on GitHub',
+    problem_tag: 'The problem',
+    problem_title: 'A cryptic charge appears… and the customer calls the bank',
+    problem_body: 'Statement descriptors are unreadable merchant codes. Customers can\'t tell what was charged or why. The result: anxiety, unnecessary disputes, and heavy pressure on call centers.',
+    solution_tag: 'The solution',
+    solution_title: 'A "Clarify" button on every transaction',
+    solution_body: 'Every transaction carries a وضح button that opens a chat explaining the charge in plain language: the real merchant behind the descriptor, why the amount was deducted, and whether it\'s a recurring subscription — with direct actions like raising a dispute or escalating to customer care, without leaving the conversation.',
+    features_title: 'What does Wadhah do?',
+    features_sub: 'Six core capabilities that turn a bank statement from a puzzle into a conversation.',
+    f1_t: 'Merchant name decoding',
+    f1_b: 'Decodes cryptic statement descriptors into the real merchant, location, and payment channel.',
+    f2_t: 'Subscription detection',
+    f2_b: 'Identifies recurring charges and renewal patterns before they surprise you.',
+    f3_t: 'Fee & product explanations',
+    f3_b: 'Answers questions about bank fees, cards, and products in plain language.',
+    f4_t: 'In-chat actions',
+    f4_b: 'Dispute a transaction, escalate to customer care, or cancel a subscription — right from the chat.',
+    f5_t: 'Context-aware answers',
+    f5_b: 'Every answer is grounded in your actual transaction history, not generic replies.',
+    f6_t: 'Merchant on the map',
+    f6_b: 'Unsure about a charge? Wadhah opens the POS terminal\'s location on a map to verify.',
+    demo_title: 'Try it yourself',
+    demo_sub: 'A live interactive model of the banking app with Wadhah — click through it like the real thing.',
+    demo_hint: 'Try: tap "عرض الكل" then the "وضح" button on any transaction to see the scenarios',
+    demo_full: 'Open the demo full screen',
+    tech_title: 'Technology & architecture',
+    tech_sub: 'Native UIs on top of a shared logic core — plus a complete Flutter port on its own branch.',
+    tech_swift: 'Native iOS experience (iOS 17+) with a fully RTL Arabic interface.',
+    tech_kmp: 'Cross-platform core: models, merchant enrichment, and assistant orchestration.',
+    tech_flutter: 'A complete cross-platform port of the same app on the flutter-wadhah branch.',
+    team_title: 'The team',
+    team_sub: 'The team behind Wadhah at the Amad Hackathon.',
+    member_placeholder: 'Team member',
+    member_role: '—',
+    footer_note: 'Built for the Amad Hackathon 2026',
+  },
+};
+
+let lang = localStorage.getItem('wadhah-lang') || 'ar';
+
+function applyLang() {
+  const dict = I18N[lang];
+  document.documentElement.lang = lang;
+  document.documentElement.dir = lang === 'ar' ? 'rtl' : 'ltr';
+  document.querySelectorAll('[data-i18n]').forEach((el) => {
+    const value = dict[el.dataset.i18n];
+    if (value !== undefined) el.textContent = value;
+  });
+  document.getElementById('lang-toggle').textContent = lang === 'ar' ? 'EN' : 'عربي';
+  document.title = lang === 'ar'
+    ? 'وضّح — Wadhah | مساعدك البنكي الذكي'
+    : 'Wadhah — your AI banking assistant';
+}
+
+function toggleLang() {
+  lang = lang === 'ar' ? 'en' : 'ar';
+  localStorage.setItem('wadhah-lang', lang);
+  applyLang();
+}
+
+applyLang();
+</script>
+</body>
+</html>
