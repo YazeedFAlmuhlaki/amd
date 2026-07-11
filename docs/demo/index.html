@@ -74,7 +74,7 @@
   .header-row { display: flex; align-items: center; gap: 12px; }
   .bank-logo {
     width: 52px; height: 52px; border-radius: 16px; object-fit: cover;
-    background: #fff; flex: none;
+    flex: none;
   }
   .greeting .hi { font-size: 13px; color: var(--text-2); }
   .greeting .name { font-size: 19px; font-weight: 700; color: var(--text); margin-top: 2px; }
@@ -158,7 +158,8 @@
     border: none; cursor: pointer;
   }
   .pill-holder { display: flex; justify-content: flex-end; }
-  .wadhah-pill img { width: 22px; height: 22px; border-radius: 50%; object-fit: cover; }
+  /* The real logo glyph, tight-cropped — shown at its true aspect, unclipped */
+  .wadhah-pill img { height: 20px; width: auto; }
 
   .cta {
     height: 48px; border-radius: 14px; background: var(--accent);
@@ -315,7 +316,7 @@
         <div class="home-content">
 
           <div class="header-row">
-            <img class="bank-logo" src="assets/banklogo.png" alt="بنك الإنماء">
+            <img class="bank-logo" src="assets/banklogo.png?v=2" alt="بنك الإنماء">
             <div class="greeting">
               <div class="hi">مساء الخير</div>
               <div class="name">مرحبًا أنس 👋</div>
@@ -412,9 +413,9 @@
 <script>
 /* ---------------- Data (mirrors Models.swift) ---------------- */
 const HOME_TX = [
-  { m: "آبل",          s: "اليوم · 9:15 ص", a: "-3.69 SAR",  icon: "i-phone"  },
-  { m: "ثمار التنمية", s: "أمس · 8:30 م",   a: "-84.00 SAR", icon: "i-basket" },
-  { m: "هنقرستيشن",    s: "قبل يومين",       a: "-50.84 SAR", icon: "i-fork"   },
+  { m: "APPLE COM BILL",               s: "اليوم · 9:15 ص", a: "-3.69 SAR",  icon: "i-phone"  },
+  { m: "THAMAR AL-TANMIYA TRADING CO", s: "أمس · 8:30 م",   a: "-84.00 SAR", icon: "i-basket" },
+  { m: "HUNGERSTATION LLC",            s: "قبل يومين",       a: "-50.84 SAR", icon: "i-fork"   },
 ];
 
 const HISTORY_TX = [
@@ -463,7 +464,7 @@ function txRowHTML(t, opts) {
   const chev = opts.chevron ? '<svg class="icon chev"><use href="#i-chevron-l"/></svg>' : "";
   const pill = opts.pill
     ? '<div class="pill-holder"><button class="wadhah-pill" onclick="openChat(\'' + (t.sc || "") + '\',\'' + t.m.replace(/'/g, "") + '\')">' +
-      '<span>وضح</span><img src="assets/wad.png" alt=""></button></div>'
+      '<span>وضح</span><img src="assets/wad-glyph.png" alt=""></button></div>'
     : "";
   return (
     '<div class="tx-row">' +
@@ -505,14 +506,30 @@ function bubbleAssistant(text, actions) {
   );
 }
 
+let openingReplyTimer;
 function openChat(scenarioKey, merchant) {
   const sc = SCENARIOS[scenarioKey] || genericScenario(merchant || "المتجر");
+  clearTimeout(openingReplyTimer);
+  // Wadhah "analyzes" the transaction first: question + typing indicator,
+  // then the explanation lands after a beat.
   thread.innerHTML =
     bubbleUser(sc.user) +
-    bubbleAssistant(sc.assistant, sc.actions) +
-    '<div class="msg-time">وضح · الآن</div>';
+    '<div class="msg-row-assist" id="opening-typing">' +
+      '<div class="msg-assist"><div class="typing"><span></span><span></span><span></span></div></div>' +
+      '<div class="msg-avatar"><img src="assets/wad.png" alt=""></div>' +
+    "</div>";
   navigate("screen-chat");
   scrollChat();
+
+  openingReplyTimer = setTimeout(() => {
+    const typing = document.getElementById("opening-typing");
+    if (!typing) return;
+    typing.remove();
+    thread.insertAdjacentHTML("beforeend",
+      bubbleAssistant(sc.assistant, sc.actions) +
+      '<div class="msg-time">وضح · الآن</div>');
+    scrollChat();
+  }, 1400);
 }
 
 function scrollChat() {
