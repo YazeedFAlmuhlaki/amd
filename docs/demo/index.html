@@ -85,7 +85,7 @@
   /* ---------- Shared ---------- */
   .icon { width: 1em; height: 1em; stroke: currentColor; fill: none; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; display: block; }
   .icon.filled { fill: currentColor; stroke: none; }
-  .num { direction: ltr; unicode-bidi: embed; }
+  .num { direction: ltr; unicode-bidi: isolate; }
 
   .circle-btn {
     width: 44px; height: 44px; border-radius: 50%;
@@ -165,11 +165,11 @@
     display: flex; align-items: center; justify-content: center; font-size: 16px;
   }
   .tx-icon.round { border-radius: 50%; width: 44px; height: 44px; border: 1px solid rgba(255,255,255,.12); }
-  .tx-info { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
+  .tx-info { display: flex; flex-direction: column; gap: 3px; min-width: 0; flex: 1; }
   .tx-info .m { font-size: 14px; font-weight: 700; color: var(--text); }
   .tx-info .s { font-size: 11px; color: var(--text-2); }
   .tx-amt {
-    margin-inline-start: auto; display: flex; align-items: center; gap: 6px;
+    display: flex; align-items: center; gap: 6px;
     direction: ltr; flex: none;
   }
   .tx-amt .chev { color: var(--text-2); font-size: 11px; }
@@ -317,7 +317,13 @@
   .vc-dot { display: inline-block; width: 7px; height: 7px; border-radius: 50%; background: #1E9E6A; margin-inline-end: 5px; }
   .vc-explain { font-size: 13px; line-height: 1.8; }
   .vc-how { border-top: 1px dashed #E0D7CA; padding-top: 9px; }
-  .vc-how summary { font-size: 11.5px; font-weight: 700; color: #8A8177; cursor: pointer; }
+  .vc-how summary { font-size: 11.5px; font-weight: 700; color: #8A8177; cursor: pointer; list-style: none; }
+  .vc-how summary::-webkit-details-marker { display: none; }
+  .vc-how summary::before { content: "▸ "; }
+  .vc-how[open] summary::before { content: "▾ "; }
+  .vc-more { font-size: 11.5px; font-weight: 700; color: #A2542E; cursor: pointer; text-decoration: underline; }
+  .vc-full { display: none; }
+  .vc-full.show { display: block; }
   .vc-how .steps { margin-top: 8px; display: flex; flex-direction: column; gap: 5px; font-size: 11px; color: #6E665C; line-height: 1.7; }
   .vc-how .steps b { color: #2A2A2A; }
 
@@ -485,18 +491,18 @@
    العمليات كما تصل من الشبكة (الوصف الخام). التفسير لم يعد مكتوبًا
    يدويًا: محرك وضّح يطابق الوصف مع الجدول المرجعي (wathq-data.js). */
 const HOME_TX = [
-  { m: "ADDRESS CAFE TRD CO",          s: "اليوم · 7:40 ص", a: "-28.00 SAR", icon: "i-cup"    },
-  { m: "APPLE COM BILL",               s: "اليوم · 9:15 ص", a: "-3.69 SAR",  icon: "i-phone"  },
-  { m: "THAMAR AL-TANMIYA TRADING CO", s: "أمس · 8:30 م",   a: "-84.00 SAR", icon: "i-basket" },
+  { m: "APPLE COM BILL",      s: "اليوم · 9:15 ص", a: "-3.69 SAR",  icon: "i-phone" },
+  { m: "ADDRESS CAFE TRD CO", s: "اليوم · 7:40 ص", a: "-28.00 SAR", icon: "i-cup"   },
+  { m: "AL NAHDI MEDICAL CO", s: "أمس · 6:05 م",   a: "-45.30 SAR", icon: "i-bag"   },
 ];
 
 const HISTORY_TX = [
-  { m: "ADDRESS CAFE TRD CO",          s: "مقهى · اليوم · 7:40 ص",                     a: "-28.00 SAR",  icon: "i-cup"    },
   { m: "APPLE COM BILL",               s: "خدمات وتطبيقات إلكترونية · اليوم · 9:15 ص", a: "-3.69 SAR",   icon: "i-phone"  },
+  { m: "ADDRESS CAFE TRD CO",          s: "مقهى · اليوم · 7:40 ص",                     a: "-28.00 SAR",  icon: "i-cup"    },
   { m: "THAMAR AL-TANMIYA TRADING CO", s: "نقاط بيع - مدى · أمس · 8:30 م",             a: "-84.00 SAR",  icon: "i-basket" },
+  { m: "AL NAHDI MEDICAL CO",          s: "صيدلية · أمس · 6:05 م",                     a: "-45.30 SAR",  icon: "i-bag"    },
   { m: "HUNGERSTATION LLC",            s: "توصيل طعام · قبل يومين",                    a: "-50.84 SAR",  icon: "i-fork"   },
-  { m: "NAFT SERVICES CO",             s: "محطة وقود · قبل ٣ أيام",                    a: "-120.00 SAR", icon: "i-fuel"   },
-  { m: "ELIXIR BUN CO",                s: "قهوة مختصة · قبل ٤ أيام",                   a: "-26.00 SAR",  icon: "i-cup"    },
+  { m: "ALDREES PETROLEUM CO",         s: "محطة وقود · قبل ٣ أيام",                    a: "-120.00 SAR", icon: "i-fuel"   },
 ];
 
 /* سؤال العميل: نص السيناريو المحفوظ إن وجد، وإلا سؤال عام */
@@ -596,14 +602,23 @@ function identityCard(res, tx) {
     (tx ? '<div class="vc-row"><span class="k">العملية</span><span class="v"><span class="num">' + tx.a + '</span> · ' + tx.s + '</span></div>' : "");
 
   const legalLine = m.legalName && m.legalName !== m.displayName
-    ? 'الاسم الرسمي: ' + m.legalName + (m.displayBranch ? ' · ' + m.displayBranch : "")
+    ? 'الاسم الرسمي: <bdi>' + m.legalName + '</bdi>' + (m.displayBranch ? ' · ' + m.displayBranch : "")
     : (m.displayBranch || "");
+
+  const hasMore = m.explanation && m.explanationShort && m.explanation !== m.explanationShort;
+  const explainBlock =
+    '<div class="vc-explain">' + (m.explanationShort || m.explanation) +
+      (hasMore
+        ? ' <span class="vc-more" onclick="toggleExplain(this)">عرض التفاصيل</span>' +
+          '<span class="vc-full"> ' + m.explanation + '</span>'
+        : "") +
+    "</div>";
 
   const how =
     '<details class="vc-how"><summary>كيف طابقنا هذا الاسم؟</summary><div class="steps">' +
-      '<div>المدخل الخام: <b><span class="num">' + (tx ? tx.m : res.normalizedInput) + '</span></b></div>' +
+      '<div>المدخل الخام: <b><bdi class="num">' + (tx ? tx.m : res.normalizedInput) + '</bdi></b></div>' +
       '<div>بعد التطبيع: <b>' + res.normalizedInput + '</b></div>' +
-      '<div>المرادف المطابق: <b>' + res.matchedAlias + '</b></div>' +
+      '<div>المرادف المطابق: <b><bdi>' + res.matchedAlias + '</bdi></b></div>' +
       '<div>درجة التشابه: <b><span class="num">' + res.confidence + '%</span></b></div>' +
       '<div>المصدر: <b>' + (verified ? "واثق — السجل التجاري (وزارة التجارة)" : "الجدول الأولي — بانتظار التوثيق") + '</b></div>' +
     "</div></details>";
@@ -620,7 +635,7 @@ function identityCard(res, tx) {
         '<div class="vc-top">' + badge + conf + "</div>" +
         '<div><div class="vc-name">' + m.displayName + '</div><div class="vc-sub">' + legalLine + "</div></div>" +
         '<div class="vc-rows">' + rows + "</div>" +
-        '<div class="vc-explain">' + m.explanation + "</div>" +
+        explainBlock +
         how + actions +
       "</div>" +
       '<div class="msg-avatar"><img src="assets/wad.png" alt=""></div>' +
@@ -628,9 +643,15 @@ function identityCard(res, tx) {
   );
 }
 
+function toggleExplain(el) {
+  const full = el.nextElementSibling;
+  const open = full.classList.toggle("show");
+  el.textContent = open ? "إخفاء التفاصيل" : "عرض التفاصيل";
+}
+
 function noMatchBubble() {
   return bubbleAssistant(
-    "ما قدرت أوثّق هذا الاسم من الجدول الحالي (6 تجار في النسخة التجريبية).\n" +
+    "ما قدرت أوثّق هذا الاسم من الجدول التجريبي الحالي (" + WATHQ_MERCHANTS.length + " تجار).\n" +
     "في النسخة الكاملة، أي اسم غير معروف يُضاف تلقائيًا لقائمة التوثيق القادمة من واثق.\n" +
     "إذا كانت عندك عملية محددة، افتحها من سجل العمليات واضغط زر (وضح).",
     null
@@ -647,8 +668,8 @@ function ackClear() {
 function fileDispute(merchantId) {
   const m = WATHQ_MERCHANTS.find(x => x.id === merchantId);
   const idLine = m && m.crNumber
-    ? "هوية التاجر: " + m.legalName + " (س.ت <span class='num'>" + m.crNumber + "</span>) — موثقة من السجل التجاري"
-    : "هوية التاجر: " + (m ? m.legalName : "غير محددة") + " — قيد التوثيق";
+    ? "هوية التاجر: <bdi>" + m.legalName + "</bdi> (س.ت <bdi class='num'>" + m.crNumber + "</bdi>) — موثقة من السجل التجاري"
+    : "هوية التاجر: <bdi>" + (m ? m.legalName : "غير محددة") + "</bdi> — قيد التوثيق";
   thread.insertAdjacentHTML("beforeend",
     bubbleAssistant(
       "جهزت ملف الاعتراض وأرفقت الأدلة تلقائيًا:\n" +
